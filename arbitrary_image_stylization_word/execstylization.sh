@@ -1,0 +1,1 @@
+python  arbitrary_image_stylization_with_weights.py  --checkpoint=arbitrary_style_transfer/model.ckpt  --output_dir=outputs_style  --style_images_paths=images/style_images_own/*.jpg  --content_images_paths=images/content_images_own/*.jpg --image_size=256  --content_square_crop=False  --style_image_size=256  --style_square_crop=False --logtostderr
