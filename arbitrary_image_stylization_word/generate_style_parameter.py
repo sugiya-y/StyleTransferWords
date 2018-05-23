@@ -58,8 +58,7 @@ flags.DEFINE_string('interpolation_weights', '[1.0]', 'List of weights'
                     'of 0.0 means identity transform.')
 FLAGS = flags.FLAGS
 
-
-def main(unused_argv=None):
+def styleParam(content_image_paths,style_image_paths):
     tf.logging.set_verbosity(tf.logging.INFO)
     if not tf.gfile.Exists(FLAGS.output_dir):
         tf.gfile.MkDir(FLAGS.output_dir)

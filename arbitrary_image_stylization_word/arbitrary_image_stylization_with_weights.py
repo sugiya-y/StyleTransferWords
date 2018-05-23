@@ -26,6 +26,7 @@ from __future__ import print_function
 
 import ast
 import os
+import time
 
 import numpy as np
 import tensorflow as tf
@@ -60,6 +61,8 @@ FLAGS = flags.FLAGS
 
 
 def main(unused_argv=None):
+    print('timer start')
+    start = time.time()
     tf.logging.set_verbosity(tf.logging.INFO)
     if not tf.gfile.Exists(FLAGS.output_dir):
         tf.gfile.MkDir(FLAGS.output_dir)
@@ -179,7 +182,9 @@ def main(unused_argv=None):
                         stylized_image_res,
                         os.path.join(FLAGS.output_dir, '%s_stylized_%s_%d.jpg' %
                                      (content_img_name, style_img_name, interp_i)))
-
+    elapsed_time = time.time() - start
+    print("timer stop")
+    print(elapsed_time)
 
 if __name__ == '__main__':
     tf.app.run(main)
