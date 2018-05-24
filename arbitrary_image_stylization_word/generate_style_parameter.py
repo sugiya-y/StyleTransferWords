@@ -24,7 +24,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import ast
 import os
 
 import numpy as np
@@ -48,6 +47,7 @@ interpolation_weights_in = '[1.0]'
 
 def styleParam(content_image_paths, style_image_paths):
     tf.logging.set_verbosity(tf.logging.INFO)
+    style_param_matrix = []
     if not tf.gfile.Exists(output_dir):
         tf.gfile.MkDir(output_dir)
 
@@ -99,6 +99,7 @@ def styleParam(content_image_paths, style_image_paths):
             style_img_list = np.random.permutation(style_img_list)
             style_img_list = style_img_list[:maximum_styles_to_evaluate]
 
+        """
         # Gets list of input content images.
         content_img_list = tf.gfile.Glob(content_images_paths)
 
@@ -115,54 +116,26 @@ def styleParam(content_image_paths, style_image_paths):
             image_utils.save_np_image(inp_img_croped_resized_np,
                                       os.path.join(output_dir,
                                                    '%s.jpg' % (content_img_name)))
+        """
+        for style_i, style_img_path in enumerate(style_img_list):
+            if style_i > maximum_styles_to_evaluate:
+                break
+            style_img_name = os.path.basename(style_img_path)[:-4]
+            style_image_np = image_utils.load_np_image_uint8(style_img_path)[:, :, :
+                                                                             3]
+            # Saves preprocessed style image.
+            style_img_croped_resized_np = sess.run(
+                style_img_preprocessed, feed_dict={
+                    style_img_ph: style_image_np
+                })
+            image_utils.save_np_image(style_img_croped_resized_np,
+                                      os.path.join(output_dir,
+                                                   '%s.jpg' % (style_img_name)))
 
             # Computes bottleneck features of the style prediction network for the
-            # identity transform.
-            identity_params = sess.run(
-                bottleneck_feat, feed_dict={style_img_ph: content_img_np})
+            # given style image.
+            style_params = sess.run(
+                bottleneck_feat, feed_dict={style_img_ph: style_image_np})
+            style_param_matrix.append(style_params)
 
-            for style_i, style_img_path in enumerate(style_img_list):
-                if style_i > maximum_styles_to_evaluate:
-                    break
-                style_img_name = os.path.basename(style_img_path)[:-4]
-                style_image_np = image_utils.load_np_image_uint8(style_img_path)[:, :, :
-                                                                                 3]
-
-                if style_i % 10 == 0:
-                    tf.logging.info('Stylizing (%d) %s with (%d) %s' %
-                                    (content_i, content_img_name, style_i,
-                                     style_img_name))
-
-                # Saves preprocessed style image.
-                style_img_croped_resized_np = sess.run(
-                    style_img_preprocessed, feed_dict={
-                        style_img_ph: style_image_np
-                    })
-                image_utils.save_np_image(style_img_croped_resized_np,
-                                          os.path.join(output_dir,
-                                                       '%s.jpg' % (style_img_name)))
-
-                # Computes bottleneck features of the style prediction network for the
-                # given style image.
-                style_params = sess.run(
-                    bottleneck_feat, feed_dict={style_img_ph: style_image_np})
-
-                interpolation_weights = ast.literal_eval(
-                    interpolation_weights_in)
-                # Interpolates between the parameters of the identity transform and
-                # style parameters of the given style image.
-                for interp_i, wi in enumerate(interpolation_weights):
-                    stylized_image_res = sess.run(
-                        stylized_images,
-                        feed_dict={
-                            bottleneck_feat:
-                                identity_params * (1 - wi) + style_params * wi,
-                            content_img_ph:
-                                content_img_np
-                        })
-
-                    # Saves stylized image.
-                    image_utils.save_np_image(
-                        stylized_image_res,
-                        os.path.join(output_dir, '%s_stylized_%s_%d.jpg' %
-                                     (content_img_name, style_img_name, interp_i)))
+    return(style_param_matrix)

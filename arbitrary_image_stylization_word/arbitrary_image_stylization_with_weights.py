@@ -186,5 +186,6 @@ def main(unused_argv=None):
     print("timer stop")
     print(elapsed_time)
 
+
 if __name__ == '__main__':
     tf.app.run(main)
