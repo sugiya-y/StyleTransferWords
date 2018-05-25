@@ -35,8 +35,6 @@ from magenta.models.image_stylization import image_utils
 slim = tf.contrib.slim
 checkpoint_in = 'arbitrary_style_transfer/model.ckpt'
 output_dir = 'outputs_style'
-style_images_paths = 'images/style_images_own/*.jpg'
-content_images_paths = 'images/content_images_own/*.jpg'
 image_size = 256
 content_square_crop = False
 style_image_size = 256
@@ -45,7 +43,7 @@ maximum_styles_to_evaluate = 1024
 interpolation_weights_in = '[1.0]'
 
 
-def styleParam(content_image_paths, style_image_paths):
+def styleParam(style_images_paths):
     tf.logging.set_verbosity(tf.logging.INFO)
     style_param_matrix = []
     if not tf.gfile.Exists(output_dir):
@@ -99,24 +97,6 @@ def styleParam(content_image_paths, style_image_paths):
             style_img_list = np.random.permutation(style_img_list)
             style_img_list = style_img_list[:maximum_styles_to_evaluate]
 
-        """
-        # Gets list of input content images.
-        content_img_list = tf.gfile.Glob(content_images_paths)
-
-        for content_i, content_img_path in enumerate(content_img_list):
-            content_img_np = image_utils.load_np_image_uint8(content_img_path)[:, :, :
-                                                                               3]
-            content_img_name = os.path.basename(content_img_path)[:-4]
-
-            # Saves preprocessed content image.
-            inp_img_croped_resized_np = sess.run(
-                content_img_preprocessed, feed_dict={
-                    content_img_ph: content_img_np
-                })
-            image_utils.save_np_image(inp_img_croped_resized_np,
-                                      os.path.join(output_dir,
-                                                   '%s.jpg' % (content_img_name)))
-        """
         for style_i, style_img_path in enumerate(style_img_list):
             if style_i > maximum_styles_to_evaluate:
                 break
