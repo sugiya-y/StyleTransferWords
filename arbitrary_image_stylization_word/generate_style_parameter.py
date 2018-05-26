@@ -118,4 +118,5 @@ def styleParam(style_images_paths):
                 bottleneck_feat, feed_dict={style_img_ph: style_image_np})
             style_param_matrix.append(style_params)
 
+    # style_param_matrix is (num_of_images,1,1,100) vector
     return(style_param_matrix)
