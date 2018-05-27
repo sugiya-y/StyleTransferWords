@@ -3,7 +3,7 @@
 import numpy
 
 
-def word2vecter(in_word):
+def word2vector(in_word):
 
     with open('word2vec.model', 'r') as f:
         ss = f.readline().split()
