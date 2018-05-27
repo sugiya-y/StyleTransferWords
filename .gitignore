@@ -6,4 +6,5 @@
 /arbitrary_image_stylization_word/outputs_style/*
 /arbitrary_image_stylization_word/checkpoints/*
 /arbitrary_image_stylization_word/module_gitignore/
+/arbitrary_image_stylization_word/word2vec.model
 *.pyc
