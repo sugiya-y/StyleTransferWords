@@ -10,12 +10,10 @@ import cv2 as cv
 from PIL import ImageFile
 from chainer import cuda, Variable, optimizers, serializers
 # from net import *
-from small import *
-from netXX import *
+# from small import *
+# from netXX import *
 # import marshal
-sys.path.append('../word2vec_wikipedia/')
 from wordparam import word2vecter
-sys.path.append('../chainer-imagenet-vgg/')
 from VGGparam2 import vggparamater
 from VGGNet2 import VGGNet
 ImageFile.LOAD_TRUNCATED_IMAGES = True
