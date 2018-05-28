@@ -14,8 +14,8 @@ from chainer import cuda, Variable, optimizers, serializers
 # from netXX import *
 # import marshal
 from wordparam import word2vecter
-from VGGparam2 import vggparamater
-from VGGNet2 import VGGNet
+from vggparam import vggparamater
+from vggnet import VGGNet
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 # ####単語とimg pathから1200次元ベクトルをつくる#####

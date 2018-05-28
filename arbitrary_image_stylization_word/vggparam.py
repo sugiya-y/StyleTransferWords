@@ -1,17 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import chainer
 import numpy as np
 import cv2 as cv
 import cPickle as pickle
-from VGGNet2 import VGGNet
 from chainer import cuda
-from chainer import serializers
 from chainer import Variable
-import chainermn
 
-def vggparamater(image,gpu,vgg): #image:str(path to image file) gpu:number(gpu-id)
+
+def vggparamater(image, gpu, vgg):  # image:str(path to image file) gpu:number(gpu-id)
 
     mean = np.array([103.939, 116.779, 123.68])
     img = cv.imread(image).astype(np.float32)
