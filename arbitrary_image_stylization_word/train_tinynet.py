@@ -58,16 +58,16 @@ parser.add_argument('--model', '-m', default='photo', type=str,
                     help='choose unseen model. "art" or "photo"')
 args = parser.parse_args()
 
-if args.model == 'photo':
-    unseen_model_path = '../Unseen/unseen_style_transfer/models/Pretrained_photo/out_final.model'
-elif args.model == 'art':
-    unseen_model_path = '../Unseen/unseen_style_transfer/models/unseen.model'
-else:
-    print('enter model type with "photo" or "art" in -m args')
-    sys.exit()
+# if args.model == 'photo':
+    # unseen_model_path = '../Unseen/unseen_style_transfer/models/Pretrained_photo/out_final.model'
+# elif args.model == 'art':
+    # unseen_model_path = '../Unseen/unseen_style_transfer/models/unseen.model'
+# else:
+    # print('enter model type with "photo" or "art" in -m args')
+    # sys.exit()
 
-unseen_model = FastStyleNetSmall()
-serializers.load_npz(unseen_model_path, unseen_model)
+# unseen_model = FastStyleNetSmall()
+# serializers.load_npz(unseen_model_path, unseen_model)
 
 # comm = chainermn.create_communicator()
 # device = comm.intra_rank
@@ -92,31 +92,25 @@ else:
 serializers.save_npz(
     'models/{}/{}_{}_{}.model'.format(args.dir, args.output, epoch, savecount), a)
 
-if device >= 0:
-    cuda.get_device(device).use()
-    unseen_model.to_gpu()
-xp = np if args.gpu < 0 else cuda.cupy
-
-
 # 各種必要なパラメータを読み込み
 
 # VGGmodelを読み込む
 print('loading VGG model...')
 vgg = VGGNet()
-serializers.load_hdf5('../chainer-imagenet-vgg/VGG.model', vgg)
+serializers.load_hdf5('VGG.model', vgg)
 print('loaded VGG!')
 
 # wordsに形容詞を読み込む
-print('words loading...')
-f = open('dataset/art.txt')
-words = f.readlines()
-f.close()
-for i in range(len(words)):
+# print('words loading...')
+# f = open('images/labels.txt')
+# words = f.readlines()
+# f.close()
+# for i in range(len(words)):
     # print words[i]
-    if (words[i] == '\n'):
-        del words[i]
+    # if (words[i] == '\n'):
+        # del words[i]
 
-print('words loaded!')
+# print('words loaded!')
 
 # imgに画像pathをたくさん読み込む
 print('content image loading...')
