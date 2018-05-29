@@ -13,7 +13,7 @@ from chainer import cuda, Variable, optimizers, serializers
 # from small import *
 # from netXX import *
 # import marshal
-from wordparam import word2vecter
+from wordparam import word2vector
 from vggparam import vggparamater
 from vggnet import VGGNet
 ImageFile.LOAD_TRUNCATED_IMAGES = True
