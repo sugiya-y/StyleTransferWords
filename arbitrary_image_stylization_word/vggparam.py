@@ -16,10 +16,6 @@ def vggparamater(image, gpu, vgg):  # image:str(path to image file) gpu:number(g
     img = cv.resize(img, (224, 224)).transpose((2, 0, 1))
     img = img[np.newaxis, :, :, :]
 
-    '''
-    vgg = VGGNet()
-    serializers.load_hdf5('../chainer-imagenet-vgg/VGG.model', vgg)
-    '''
     if gpu >= 0:
         cuda.get_device(gpu).use()
         vgg.to_gpu()
@@ -32,27 +28,16 @@ def vggparamater(image, gpu, vgg):  # image:str(path to image file) gpu:number(g
     else:
         pred = pred.data
 
-    with open('../chainer-imagenet-vgg/PCAfittest.pickle','rb') as f:
+    with open('pca.pickle', 'rb') as f:
         pca = pickle.load(f)
 
     result = pca.transform(pred)
 
-    #PCAmean = np.load('PCAmean.npy')
-    #PCAeigen = np.load('PCAeigen.npy')
+    # PCAmean = np.load('PCAmean.npy')
+    # PCAeigen = np.load('PCAeigen.npy')
 
-    #result = cv2.PCAProject(pred,PCAmean,PCAeigen)
+    # result = cv2.PCAProject(pred,PCAmean,PCAeigen)
 
-    #print np.shape(result)
+    # print np.shape(result)
     return result
-    #return pred
-
-'''
-    words = open('../chainer-imagenet-vgg/data/synset_words.txt').readlines()
-    words = [(w[0], ' '.join(w[1:])) for w in [w.split() for w in words]]
-    words = np.asarray(words)
-
-    top5 = np.argsort(pred)[0][::-1][:5]
-    probs = np.sort(pred)[0][::-1][:5]
-    for w, p in zip(words[top5], probs):
-        print('{}\tprobability:{}'.format(w, p))
-'''
+    # return pred
