@@ -27,7 +27,7 @@ def concatData(word, cont_img_param, g, vgg):
         vec = np.load('wordparam/word2vecter' + word + '.npy')
         # print 'word2vecter loaded!!'
     else:
-        vec = word2vecter(word)
+        vec = word2vector(word)
         # 時間がかかるのでデータを保存する
         np.save('wordparam/word2vecter' + word + '.npy', vec)
         # print 'word2vecter saved!!'
@@ -89,8 +89,8 @@ else:
     os.mkdir('models/' + args.dir)
 
 
-serializers.save_npz(
-    'models/{}/{}_{}_{}.model'.format(args.dir, args.output, epoch, savecount), a)
+# serializers.save_npz(
+    # 'models/{}/{}_{}_{}.model'.format(args.dir, args.output, epoch, savecount), a)
 
 # 各種必要なパラメータを読み込み
 
