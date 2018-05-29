@@ -32,24 +32,26 @@ import tensorflow as tf
 import arbitrary_image_stylization_build_model as build_model
 from magenta.models.image_stylization import image_utils
 
-slim = tf.contrib.slim
-checkpoint_in = 'arbitrary_style_transfer/model.ckpt'
-output_dir = 'outputs_style'
-image_size = 256
-content_square_crop = False
-style_image_size = 256
-style_square_crop = False
-maximum_styles_to_evaluate = 1024
-interpolation_weights_in = '[1.0]'
-
 
 def styleParam(style_images_paths):
+    config = tf.ConfigProto(gpu_options=tf.GPUOptions(allow_growth=True))
+    sess = tf.Session(config=config)
+    slim = tf.contrib.slim
+    checkpoint_in = 'arbitrary_style_transfer/model.ckpt'
+    output_dir = 'outputs_style'
+    image_size = 256
+    content_square_crop = False
+    style_image_size = 256
+    style_square_crop = False
+    maximum_styles_to_evaluate = 1024
+    interpolation_weights_in = '[1.0]'
+
     tf.logging.set_verbosity(tf.logging.INFO)
     style_param_matrix = []
     if not tf.gfile.Exists(output_dir):
         tf.gfile.MkDir(output_dir)
 
-    with tf.Graph().as_default(), tf.Session() as sess:
+    with tf.Graph().as_default(), sess:
         # Defines place holder for the style image.
         style_img_ph = tf.placeholder(tf.float32, shape=[None, None, 3])
         if style_square_crop:

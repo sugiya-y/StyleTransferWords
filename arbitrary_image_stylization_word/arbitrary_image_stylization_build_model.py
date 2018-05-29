@@ -68,6 +68,9 @@ def build_model(content_input_,
     """
     # Gets scope name and shape of the activations of transformer network which
     # will be used to apply style.
+    config = tf.ConfigProto(gpu_options=tf.GPUOptions(allow_growth=True))
+    sess = tf.Session(config=config)
+
     [activation_names,
      activation_depths] = transformer_model.style_normalization_activations()
 

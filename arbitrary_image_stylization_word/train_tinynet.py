@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# まずは画像のパラメータを拾得する
+from generate_style_parameter import styleParam
+print('preprocessing target style data')
+tar_img_param = styleParam('images/style_images_own/*.jpg')
+
 import numpy as np
 import os
 import argparse
@@ -154,6 +159,7 @@ vgg_img_param = []
 
 for filename in filenames:
     vgg_img_param.append(vggparamater(filename, args.gpu, vgg))
+# vgg_img_param is (num_img, 1, 300)
 
 print(np.shape(vgg_img_param))
 # print cont_img_param[0]
