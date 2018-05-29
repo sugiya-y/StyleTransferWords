@@ -158,7 +158,7 @@ for filename in filenames:
 print(np.shape(vgg_img_param))
 # print cont_img_param[0]
 #############################################################################
-
+'''
 dataset = [words, con_img_paths, cont_img_param]
 
 train = []
