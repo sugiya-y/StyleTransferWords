@@ -114,6 +114,7 @@ print('loaded VGG!')
 
 # imgに画像pathをたくさん読み込む
 print('content image loading...')
+"""
 con_img_paths = []
 for j in range(len(words)):
     con_img_paths.append([])
@@ -127,10 +128,12 @@ for j in range(len(words)):
             if os.path.isfile('dataset/art/' + str(j) + '/' + str(i) + '.png'):
                 con_img_paths[j].append(
                     'dataset/art/' + str(j) + '/' + str(i) + '.png')
+"""
+filenames = np.load('images/filenames.npy')
 print('content image loaded!')
 # print con_img_paths[0]
 
-
+"""
 if (len(words) != len(con_img_paths)):
     print('ワードリストか画像リストがおかしい！！！！！！！！！！')
     # print 'word: '
@@ -142,23 +145,17 @@ if (len(words) != len(con_img_paths)):
     print(' shape: ')
     print(np.shape(con_img_paths))
     sys.exit()
+"""
 
 # ############学習の高速化のためにパラメータを事前に整理しておく###################
 
 print('preprocessing vgg data')
-cont_img_param = []
-cont_img_pil = []
-for j in range(len(words)):
-    # cont_img_param.append([])
-    for con in con_img_paths[j]:
-        cimg = cv.imread(con)
-        if (cimg is None):
-            # print 'image is None. data skipped'
-            continue
-        # print np.shape(vggparamater(con,args.gpu,vgg))
-        cont_img_param.append(vggparamater(con, args.gpu, vgg))
+vgg_img_param = []
 
-print(np.shape(cont_img_param))
+for filename in filenames:
+    vgg_img_param.append(vggparamater(filename, args.gpu, vgg))
+
+print(np.shape(vgg_img_param))
 # print cont_img_param[0]
 #############################################################################
 
