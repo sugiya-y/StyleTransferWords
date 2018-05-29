@@ -79,7 +79,7 @@ batchsize = 10
 device = args.gpu
 savecount = 0
 epoch = 0
-a = wordQueryNet()
+# a = wordQueryNet()
 
 # 保存先をチェックする
 if os.path.exists('models/' + args.dir):
