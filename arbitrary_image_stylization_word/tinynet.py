@@ -11,9 +11,9 @@ class wordQueryNet(chainer.Chain):
         heinit = chainer.initializers.HeNormal()
         super(wordQueryNet, self).__init__(
             # c1 = L.Convolution2D(1200,1,1, stride=1, pad=0, initialW=heinit),
-            l1 = L.Linear(500, 256),
-            l2 = L.Linear(256, 256),
-            l3 = L.Linear(256, 100),
+            l1=L.Linear(500, 256),
+            l2=L.Linear(256, 256),
+            l3=L.Linear(256, 100),
 
         )
 
@@ -25,6 +25,6 @@ class wordQueryNet(chainer.Chain):
         h = self.l1(h)
         h = self.l2(F.relu(h))
         h = self.l3(F.relu(h))
-        hr = cupy.zeros((1, 1, 100))
-        hr = F.reshape(h, (1, 1, 100))
+        hr = cupy.zeros((1, 1, 1, 100))
+        hr = F.reshape(h, (1, 1, 1, 100))
         return hr

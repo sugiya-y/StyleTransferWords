@@ -33,7 +33,7 @@ import arbitrary_image_stylization_build_model as build_model
 from magenta.models.image_stylization import image_utils
 
 
-def styleParam(style_images_paths):
+def styleParam(style_img_list):
     config = tf.ConfigProto(gpu_options=tf.GPUOptions(allow_growth=True))
     sess = tf.Session(config=config)
     slim = tf.contrib.slim
@@ -93,32 +93,26 @@ def styleParam(style_images_paths):
         init_fn(sess)
 
         # Gets the list of the input style images.
-        style_img_list = tf.gfile.Glob(style_images_paths)
-        if len(style_img_list) > maximum_styles_to_evaluate:
-            np.random.seed(1234)
-            style_img_list = np.random.permutation(style_img_list)
-            style_img_list = style_img_list[:maximum_styles_to_evaluate]
+        # style_img_list = tf.gfile.Glob(style_images_paths)
+        # if len(style_img_list) > maximum_styles_to_evaluate:
+            # np.random.seed(1234)
+            # style_img_list = np.random.permutation(style_img_list)
+            # style_img_list = style_img_list[:maximum_styles_to_evaluate]
 
+        count = 0
         for style_i, style_img_path in enumerate(style_img_list):
-            if style_i > maximum_styles_to_evaluate:
-                break
-            style_img_name = os.path.basename(style_img_path)[:-4]
+            # if style_i > maximum_styles_to_evaluate:
+                # break
             style_image_np = image_utils.load_np_image_uint8(style_img_path)[:, :, :
                                                                              3]
-            # Saves preprocessed style image.
-            style_img_croped_resized_np = sess.run(
-                style_img_preprocessed, feed_dict={
-                    style_img_ph: style_image_np
-                })
-            image_utils.save_np_image(style_img_croped_resized_np,
-                                      os.path.join(output_dir,
-                                                   '%s.jpg' % (style_img_name)))
-
             # Computes bottleneck features of the style prediction network for the
             # given style image.
             style_params = sess.run(
                 bottleneck_feat, feed_dict={style_img_ph: style_image_np})
             style_param_matrix.append(style_params)
+            count += 1
+            if count % 100 == 0:
+                print(count, '/', len(style_img_list))
 
-    # style_param_matrix is (num_of_images,1,1,100) vector
+    # style_param_matrix is (num_of_images,100) vector
     return(style_param_matrix)
