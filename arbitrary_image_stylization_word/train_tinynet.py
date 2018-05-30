@@ -52,12 +52,8 @@ parser = argparse.ArgumentParser(
     description='Real-time style transfer image generator')
 parser.add_argument('--gpu', '-g', default=0, type=int,
                     help='GPU ID (negative value indicates CPU)')
-parser.add_argument('--output', '-o', default='out', type=str,
-                    help='output model file path without extension')
 parser.add_argument('--dir', '-d', type=str, required=True,
                     help='output dir path')
-parser.add_argument('--model', '-m', default='photo', type=str,
-                    help='choose unseen model. "art" or "photo"')
 args = parser.parse_args()
 
 xp = np if args.gpu < 0 else cuda.cupy
