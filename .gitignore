@@ -9,5 +9,6 @@
 /arbitrary_image_stylization_word/word2vec.model
 /arbitrary_image_stylization_word/models/
 /arbitrary_image_stylization_word/log/
+/arbitrary_image_stylization_word/out_ours/
 *.pyc
 *.model
