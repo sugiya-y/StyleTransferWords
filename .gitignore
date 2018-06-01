@@ -1,0 +1,16 @@
+/magenta/
+/style_select/
+/arbitrary_image_stylization_word/arbitrary_style_transfer/
+/arbitrary_image_stylization_word/arbitrary_style_transfer.tar.gz
+/arbitrary_image_stylization_word/outputs/*
+/arbitrary_image_stylization_word/outputs_style/*
+/arbitrary_image_stylization_word/checkpoints/*
+/arbitrary_image_stylization_word/module_gitignore/
+/arbitrary_image_stylization_word/word2vec.model
+/arbitrary_image_stylization_word/models/
+/arbitrary_image_stylization_word/log/
+/arbitrary_image_stylization_word/params/*
+/arbitrary_image_stylization_word/out_ours/
+*.pyc
+*.model
+*.pickle
