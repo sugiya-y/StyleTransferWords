@@ -12,4 +12,3 @@
 /arbitrary_image_stylization_word/out_ours/
 *.pyc
 *.model
-*.pickle
