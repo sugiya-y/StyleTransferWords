@@ -158,34 +158,34 @@ def main(unused_argv=None):
                 bottleneck_feat, feed_dict={style_img_ph: content_img_np})
 
             i = 0
-            for style_i, style_img_path in enumerate(style_img_list):
-                word = words[i]
+            for word in words:
+                # word = words[i]
                 print(word)
                 i += 1
-                if style_i > FLAGS.maximum_styles_to_evaluate:
-                    break
-                style_img_name = os.path.basename(style_img_path)[:-4]
-                style_image_np = image_utils.load_np_image_uint8(style_img_path)[:, :, :
-                                                                                 3]
+                # if style_i > FLAGS.maximum_styles_to_evaluate:
+                    # break
+                # style_img_name = os.path.basename(style_img_path)[:-4]
+                # style_image_np = image_utils.load_np_image_uint8(style_img_path)[:, :, :
+                                                                                 # 3]
 
-                if style_i % 10 == 0:
-                    tf.logging.info('Stylizing (%d) %s with (%d) %s' %
-                                    (content_i, content_img_name, style_i,
-                                     style_img_name))
+                # if style_i % 10 == 0:
+                    # tf.logging.info('Stylizing (%d) %s with (%d) %s' %
+                                    # (content_i, content_img_name, style_i,
+                                     # style_img_name))
 
                 # Saves preprocessed style image.
-                style_img_croped_resized_np = sess.run(
-                    style_img_preprocessed, feed_dict={
-                        style_img_ph: style_image_np
-                    })
-                image_utils.save_np_image(style_img_croped_resized_np,
-                                          os.path.join(FLAGS.output_dir,
-                                                       '%s.jpg' % (style_img_name)))
+                # style_img_croped_resized_np = sess.run(
+                    # style_img_preprocessed, feed_dict={
+                        # style_img_ph: style_image_np
+                    # })
+                # image_utils.save_np_image(style_img_croped_resized_np,
+                                          # os.path.join(FLAGS.output_dir,
+                                                       # '%s.jpg' % (style_img_name)))
 
                 # Computes bottleneck features of the style prediction network for the
                 # given style image.
-                style_params_ori = sess.run(
-                    bottleneck_feat, feed_dict={style_img_ph: style_image_np})
+                # style_params_ori = sess.run(
+                    # bottleneck_feat, feed_dict={style_img_ph: style_image_np})
 
                 # print(np.shape(style_params))
                 picklename = 'params/{}_{}.pickle'.format(word, j)
