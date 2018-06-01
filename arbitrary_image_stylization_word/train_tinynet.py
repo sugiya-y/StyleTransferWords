@@ -10,7 +10,7 @@ start = time.time()
 filenames = np.load('images/filenames.npy')
 print('content image loaded!')
 print('preprocessing target style data')
-# filenames = filenames[0:100]  # for testing
+filenames = filenames[0:12]  # for testing
 target_img_param = styleParam(filenames)
 calctime = time.time() - start
 print('inception v3 time: ' + str(calctime) + '[sec]')
@@ -64,7 +64,7 @@ xp = np if args.gpu < 0 else cuda.cupy
 batch = 0
 batchsize = 10
 device = args.gpu
-n_epoch = 10
+n_epoch = 3
 # a = wordQueryNet()
 
 # 保存先をチェックする

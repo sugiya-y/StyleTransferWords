@@ -191,6 +191,7 @@ def main(unused_argv=None):
                 picklename = 'params/{}_{}.pickle'.format(word, j)
                 f = open(picklename, 'r')
                 style_params = pickle.load(f)
+                print(style_params)
 
                 # print('diff of original para and made para:')
                 # print(style_params_ori - style_params)

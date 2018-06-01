@@ -32,7 +32,7 @@ def concatData(word, vgg_img_param):
     return np.transpose(param)
 
 
-model_path = 'models/out2/final.model'
+model_path = 'models/out5/final.model'
 vgg = VGGNet()
 serializers.load_hdf5('VGG.model', vgg)
 tinynet = wordQueryNet()
