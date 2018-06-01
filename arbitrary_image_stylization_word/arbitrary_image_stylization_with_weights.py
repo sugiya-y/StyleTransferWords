@@ -163,6 +163,8 @@ def main(unused_argv=None):
                 style_params = sess.run(
                     bottleneck_feat, feed_dict={style_img_ph: style_image_np})
 
+                print(style_params)
+
                 interpolation_weights = ast.literal_eval(
                     FLAGS.interpolation_weights)
                 # Interpolates between the parameters of the identity transform and
