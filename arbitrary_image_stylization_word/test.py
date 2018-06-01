@@ -50,9 +50,9 @@ slim = tf.contrib.slim
 
 flags = tf.flags
 flags.DEFINE_string('checkpoint', 'arbitrary_style_transfer/model.ckpt', 'Path to the model checkpoint.')
-flags.DEFINE_string('style_images_paths', 'images/style_images/La_forma.jpg', 'Paths to the style images'
+flags.DEFINE_string('style_images_paths', 'images/valid/*.jpg', 'Paths to the style images'
                     'for evaluation.')
-flags.DEFINE_string('content_images_paths', 'images/content_images/eiffel_tower.jpg', 'Paths to the content images'
+flags.DEFINE_string('content_images_paths', 'images/valid/*.jpg', 'Paths to the content images'
                     'for evaluation.')
 flags.DEFINE_string('output_dir', 'out_ours', 'Output directory.')
 flags.DEFINE_integer('image_size', 256, 'Image size.')
@@ -63,7 +63,7 @@ flags.DEFINE_boolean('style_square_crop', False, 'Wheather to center crop'
                      'the style image to be a square or not.')
 flags.DEFINE_integer('maximum_styles_to_evaluate', 1024, 'Maximum number of'
                      'styles to evaluate.')
-flags.DEFINE_string('interpolation_weights', '[0.0]', 'List of weights'
+flags.DEFINE_string('interpolation_weights', '[1.0]', 'List of weights'
                     'for interpolation between the parameters of the identity'
                     'transform and the style parameters of the style image. The'
                     'larger the weight is the strength of stylization is more.'
@@ -75,6 +75,8 @@ FLAGS = flags.FLAGS
 def main(unused_argv=None):
     print('timer start')
     start = time.time()
+
+    words = ['布', '植物', 'ガラス', '革', '金属', '紙', 'プラスチック', '石', '水', '木']
 
     config = tf.ConfigProto(gpu_options=tf.GPUOptions(allow_growth=True))
     sess = tf.Session(config=config)
@@ -134,7 +136,9 @@ def main(unused_argv=None):
         # Gets list of input content images.
         content_img_list = tf.gfile.Glob(FLAGS.content_images_paths)
 
+        j = -1
         for content_i, content_img_path in enumerate(content_img_list):
+            j += 1
             content_img_np = image_utils.load_np_image_uint8(content_img_path)[:, :, :
                                                                                3]
             content_img_name = os.path.basename(content_img_path)[:-4]
@@ -153,7 +157,11 @@ def main(unused_argv=None):
             identity_params = sess.run(
                 bottleneck_feat, feed_dict={style_img_ph: content_img_np})
 
+            i = 0
             for style_i, style_img_path in enumerate(style_img_list):
+                word = words[i]
+                print(word)
+                i += 1
                 if style_i > FLAGS.maximum_styles_to_evaluate:
                     break
                 style_img_name = os.path.basename(style_img_path)[:-4]
@@ -180,11 +188,12 @@ def main(unused_argv=None):
                     bottleneck_feat, feed_dict={style_img_ph: style_image_np})
 
                 # print(np.shape(style_params))
-                f = open('params/pre.pickle', 'r')
+                picklename = 'params/{}_{}.pickle'.format(word, j)
+                f = open(picklename, 'r')
                 style_params = pickle.load(f)
 
-                print('diff of original para and made para:')
-                print(style_params_ori - style_params)
+                # print('diff of original para and made para:')
+                # print(style_params_ori - style_params)
 
                 interpolation_weights = ast.literal_eval(
                     FLAGS.interpolation_weights)
@@ -204,7 +213,7 @@ def main(unused_argv=None):
                     image_utils.save_np_image(
                         stylized_image_res,
                         os.path.join(FLAGS.output_dir, '%s_stylized_%s_%d.jpg' %
-                                     (content_img_name, style_img_name, interp_i)))
+                                     (content_img_name, word, interp_i)))
     elapsed_time = time.time() - start
     print("timer stop")
     print(elapsed_time)

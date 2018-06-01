@@ -5,7 +5,7 @@ import os
 import numpy as np
 # import argparse
 # from PIL import ImageFile
-from chainer import cuda
+from chainer import cuda, serializers
 from tinynet import wordQueryNet
 from wordparam import word2vector
 from vggparam import vggparamater
@@ -32,19 +32,25 @@ def concatData(word, vgg_img_param):
     return np.transpose(param)
 
 
-word = '革'
-filename = 'images/style_images/La_forma.jpg'
+model_path = 'models/out2/final.model'
 vgg = VGGNet()
+serializers.load_hdf5('VGG.model', vgg)
 tinynet = wordQueryNet()
+serializers.load_npz(model_path, tinynet)
 tinynet.to_gpu()
-vgg_param = vggparamater(filename, 0, vgg)[0]
-concatted = concatData(word, vgg_param, )
-concatted_g = cuda.to_gpu(concatted)
-style_params = tinynet(concatted_g)
-style_params_cpu = cuda.to_cpu(style_params.data)
-# style_params = np.reshape(style_params, (1, 1, 1, 100))
+words = ['布', '植物', 'ガラス', '革', '金属', '紙', 'プラスチック', '石', '水', '木']
+for word in words:
+    for count in range(10):
+        filename = 'images/valid/{}.jpg'.format(count)
+        vgg_param = vggparamater(filename, 0, vgg)[0]
+        concatted = concatData(word, vgg_param)
+        concatted_g = cuda.to_gpu(concatted)
+        style_params = tinynet(concatted_g)
+        print(style_params.data)
+        style_params_cpu = cuda.to_cpu(style_params.data)
+        # style_params = np.reshape(style_params, (1, 1, 1, 100))
 
-print(style_params_cpu)
-f = open('params/pre.pickle', 'w')
-pickle.dump(style_params_cpu, f)
-f.close
+        print('params/{}_{}.pickle'.format(word, count))
+        f = open('params/{}_{}.pickle'.format(word, count), 'w')
+        pickle.dump(style_params_cpu, f)
+        f.close
