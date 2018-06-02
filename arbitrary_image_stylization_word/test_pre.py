@@ -5,7 +5,7 @@ import os
 import numpy as np
 # import argparse
 # from PIL import ImageFile
-from chainer import cuda, serializers
+from chainer import cuda, serializers, Variable
 from tinynet import wordQueryNet
 from wordparam import word2vector
 from vggparam import vggparamater
@@ -25,16 +25,22 @@ def concatData(word, vgg_img_param):
         np.save('wordparam/word2vecter' + word + '.npy', vec)
 
     param = np.zeros((500, 1))
-    vec = vec * 40
+    vec= vec / np.linalg.norm(vec)
+    # vec = vec * 2
+    # print('word: ' + str(np.mean(vec)))
+    # print('vgg: ' + str(np.mean(vgg_img_param)))
+    vgg_img_param=np.array(vgg_img_param)
+    vgg_img_param= vgg_img_param/ np.linalg.norm(vgg_img_param)
     concated = np.concatenate((vec, vgg_img_param))
     param = np.reshape(concated, (500, 1))
 
     return np.transpose(param)
 
 
-model_path = 'models/out5/final.model'
+model = 'test5'
+model_path = 'models/{}/final.model'.format(model)
 vgg = VGGNet()
-serializers.load_hdf5('VGG.model', vgg)
+serializers.load_hdf5('/tmp/VGG.model', vgg)
 tinynet = wordQueryNet()
 serializers.load_npz(model_path, tinynet)
 tinynet.to_gpu()
@@ -44,11 +50,16 @@ for word in words:
         filename = 'images/valid/{}.jpg'.format(count)
         vgg_param = vggparamater(filename, 0, vgg)[0]
         concatted = concatData(word, vgg_param)
-        concatted_g = cuda.to_gpu(concatted)
-        style_params = tinynet(concatted_g)
-        print(style_params.data)
+        print('moto:')
+        print(concatted[0][400:420])
+        print(concatted[0][0:10])
+        concatted_g = Variable(cuda.to_gpu(concatted))
+        style_params = tinynet(concatted_g, train=False)
+        #print(style_params.data.shape,concatted_g.data.shape)
+        print('params:')
+        print(style_params.data[0][0:10])
         style_params_cpu = cuda.to_cpu(style_params.data)
-        # style_params = np.reshape(style_params, (1, 1, 1, 100))
+        style_params_cpu = np.reshape(style_params_cpu, (1, 1, 1, 100))
 
         print('params/{}_{}.pickle'.format(word, count))
         f = open('params/{}_{}.pickle'.format(word, count), 'w')
