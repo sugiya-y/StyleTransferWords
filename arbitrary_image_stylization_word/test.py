@@ -76,7 +76,7 @@ def main(unused_argv=None):
     print('timer start')
     start = time.time()
 
-    words = ['布', '植物', 'ガラス', '革', '金属', '紙', 'プラスチック', '石', '水', '木']
+    words = ['布', '植物', 'ガラス', '革', '金属', '紙', 'プラスチック', '石', '水', '木', '樹脂', 'アクリル', 'アルミニウム', '牛皮', 'レンガ', '絹']
 
     config = tf.ConfigProto(gpu_options=tf.GPUOptions(allow_growth=True))
     sess = tf.Session(config=config)

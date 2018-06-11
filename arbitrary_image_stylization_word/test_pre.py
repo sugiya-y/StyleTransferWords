@@ -11,6 +11,7 @@ from wordparam import word2vector
 from vggparam import vggparamater
 from vggnet import VGGNet
 import pickle
+import argparse
 # import chainer
 # import chainer.functions as F
 
@@ -26,7 +27,7 @@ def concatData(word, vgg_img_param):
 
     param = np.zeros((500, 1))
     vec= vec / np.linalg.norm(vec)
-    # vec = vec * 2
+    vec = vec * 5
     # print('word: ' + str(np.mean(vec)))
     # print('vgg: ' + str(np.mean(vgg_img_param)))
     vgg_img_param=np.array(vgg_img_param)
@@ -37,16 +38,22 @@ def concatData(word, vgg_img_param):
     return np.transpose(param)
 
 
-model = 'test5'
+parser = argparse.ArgumentParser(
+    description='Real-time style transfer image generator')
+parser.add_argument('--model', '-m', type=str, required=True,
+                    help='model path')
+args = parser.parse_args()
+
+model = args.model
 model_path = 'models/{}/final.model'.format(model)
 vgg = VGGNet()
 serializers.load_hdf5('/tmp/VGG.model', vgg)
 tinynet = wordQueryNet()
 serializers.load_npz(model_path, tinynet)
 tinynet.to_gpu()
-words = ['布', '植物', 'ガラス', '革', '金属', '紙', 'プラスチック', '石', '水', '木']
+words = ['布', '植物', 'ガラス', '革', '金属', '紙', 'プラスチック', '石', '水', '木', '樹脂', 'アクリル', 'アルミニウム', '牛皮', 'レンガ', '絹']
 for word in words:
-    for count in range(16):
+    for count in range(36):
         filename = 'images/valid/{}.jpg'.format(count)
         vgg_param = vggparamater(filename, 0, vgg)[0]
         concatted = concatData(word, vgg_param)

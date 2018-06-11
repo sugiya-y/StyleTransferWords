@@ -182,13 +182,6 @@ for epoch in range(n_epoch):
         tinynet.zerograds()
         styleparam_g = Variable(chainer.cuda.to_gpu(styleg[batch:batch + batchsize]))
         styleparam = Variable(chainer.cuda.to_gpu(style[batch:batch + batchsize]))
-            #styleparam=F.concat(())
-            # print('test')
-            # print(data[1].shape)
-            # x = data[1]
-            # print(x[0][0][0][0:10])
-            #styleparam = concatData(data[0], data[2])  # styleparm: (1,500)
-            #styleparam_g = cuda.to_gpu(styleparam)
         style_vector = tinynet(styleparam_g)
         if debug:
             print('params:')
@@ -200,9 +193,9 @@ for epoch in range(n_epoch):
         loss = F.mean_squared_error(style_vector, styleparam)
         # data[1] = chainer.cuda.to_cpu(data[1])
         Lsum += loss
-        if batch<9500:
-          loss.backward()
-          Optimizer.update()
+        if batch < 9500:
+            loss.backward()
+            Optimizer.update()
         else:
           print("val loss: %s" % (loss.data))
         batch += batchsize
