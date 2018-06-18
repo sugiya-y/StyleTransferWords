@@ -28,6 +28,7 @@ import argparse
 from PIL import ImageFile
 from chainer import cuda, Variable, optimizers, serializers
 from tinynet import wordQueryNet
+from tinynet_novgg import wordQueryNetNoVGG
 from wordparam import word2vector
 from vggparam import vggparamater
 from vggnet import VGGNet
@@ -48,12 +49,12 @@ def concatData(word, vgg_img_param):
         np.save('wordparam/word2vecter' + word + '.npy', vec)
 
     param = np.zeros((500, 1))
-    vec= vec / np.linalg.norm(vec)
+    vec = vec / np.linalg.norm(vec)
     # vec = vec * 2
     # print('word: ' + str(np.mean(vec)))
     # print('vgg: ' + str(np.mean(vgg_img_param)))
-    vgg_img_param=np.array(vgg_img_param)
-    vgg_img_param= vgg_img_param/ np.linalg.norm(vgg_img_param)
+    vgg_img_param = np.array(vgg_img_param)
+    vgg_img_param = vgg_img_param / np.linalg.norm(vgg_img_param)
     concated = np.concatenate((vec, vgg_img_param))
     param = np.reshape(concated, (500, 1))
 
@@ -67,6 +68,8 @@ parser.add_argument('--gpu', '-g', default=0, type=int,
                     help='GPU ID (negative value indicates CPU)')
 parser.add_argument('--dir', '-d', type=str, required=True,
                     help='output dir path')
+parser.add_argument('--usevgg', '-u', default=1, type=int,
+                    help='use or dont use vgg: 0 or 1')
 args = parser.parse_args()
 
 xp = np if args.gpu < 0 else cuda.cupy
@@ -145,43 +148,56 @@ for filename in filenames:
 print('training start')
 dataset = []
 
-styleg=np.array(concatData(words[0],vgg_img_param[0]))
-style=np.reshape(np.array(target_img_param[0]),(1,100))
+if args.usevgg == 1:
+    styleg = np.array(concatData(words[0], vgg_img_param[0]))
+else:
+    styleg = np.array(words[0])
+style = np.reshape(np.array(target_img_param[0]), (1, 100))
 
-for i in range(1,len(filenames)):
-    styleg=np.vstack((styleg,concatData(words[i],vgg_img_param[i])))
-    style=np.vstack((style,np.reshape(target_img_param[i],(1,100))))
+if args.usevgg == 1:
+    for i in range(1, len(filenames)):
+        styleg = np.vstack((styleg, concatData(words[i], vgg_img_param[i])))
+        style = np.vstack((style, np.reshape(target_img_param[i], (1, 100))))
+else:
+    for i in range(1, len(filenames)):
+        styleg = np.vstack((styleg, words[i]))
+        style = np.vstack((style, np.reshape(target_img_param[i], (1, 100))))
 
 print(styleg.shape, style.shape)
 
-    #dataset.append([words[i], target_img_param[i], vgg_img_param[i]])
+# dataset.append([words[i], target_img_param[i], vgg_img_param[i]])
 # dataset = chainer.cuda.to_gpu(dataset)
 # dataset = [words, target_img_param, vgg_img_param]
-tinynet = wordQueryNet()
+if args.usevgg == 1:
+    tinynet = wordQueryNet()
+else:
+    tinynet = wordQueryNetNoVGG()
 
-#print('a')
-#Optimizer = optimizers.MomentumSGD(lr=0.001, momentum=0.9)
+# print('a')
+# Optimizer = optimizers.MomentumSGD(lr=0.001, momentum=0.9)
 Optimizer = optimizers.Adam(alpha=0.001, beta1=0.9, beta2=0.999, eps=1e-08)
 Optimizer.setup(tinynet)
 if device >= 0:
     cuda.get_device(device).use()
     tinynet.to_gpu()
 
-debug=False
+debug = False
 
 for epoch in range(n_epoch):
     start = time.time()
     # Optimizer.lr *= 0.1
     batch = 0
-    ct=0
+    ct = 0
     # print('epoch:' + str(epoch) + ' learning rate: ' + str(Optimizer.lr))
     print('epoch:' + str(epoch))
     Lsum = Variable(xp.zeros((), dtype=np.float32))
     while(batch + batchsize) <= style.shape[0]:
-        ct=ct+1
+        ct = ct + 1
         tinynet.zerograds()
-        styleparam_g = Variable(chainer.cuda.to_gpu(styleg[batch:batch + batchsize]))
-        styleparam = Variable(chainer.cuda.to_gpu(style[batch:batch + batchsize]))
+        styleparam_g = Variable(chainer.cuda.to_gpu(
+            styleg[batch:batch + batchsize]))
+        styleparam = Variable(chainer.cuda.to_gpu(
+            style[batch:batch + batchsize]))
         style_vector = tinynet(styleparam_g)
         if debug:
             print('params:')
@@ -197,9 +213,9 @@ for epoch in range(n_epoch):
             loss.backward()
             Optimizer.update()
         else:
-          print("val loss: %s" % (loss.data))
+            print("val loss: %s" % (loss.data))
         batch += batchsize
-        #if(batch % 1000 == 0):
+        # if(batch % 1000 == 0):
         #    print('batch loss: ' + str(loss.data))
     loss_mean = Lsum.data / ct
     print('training loss in this epoch:' + str('%1.10f' % loss_mean))
