@@ -7,6 +7,7 @@ import numpy as np
 # from PIL import ImageFile
 from chainer import cuda, serializers, Variable
 from tinynet import wordQueryNet
+from tinynet_novgg import wordQueryNetNoVGG
 from wordparam import word2vector
 from vggparam import vggparamater
 from vggnet import VGGNet
@@ -38,17 +39,36 @@ def concatData(word, vgg_img_param):
     return np.transpose(param)
 
 
+def w2v(word):
+    # 時間がかかるのでデータがあれば読み込む
+    if os.path.isfile('wordparam/word2vecter' + word + '.npy'):
+        vec = np.load('wordparam/word2vecter' + word + '.npy')
+    else:
+        vec = word2vector(word)
+        # 時間がかかるのでデータを保存する
+        np.save('wordparam/word2vecter' + word + '.npy', vec)
+
+    vec = vec / np.linalg.norm(vec)
+
+    return vec
+
+
 parser = argparse.ArgumentParser(
     description='Real-time style transfer image generator')
 parser.add_argument('--model', '-m', type=str, required=True,
                     help='model path')
+parser.add_argument('--usevgg', '-u', default=1, type=int,
+                    help='use or dont use vgg: 0 or 1')
 args = parser.parse_args()
 
 model = args.model
 model_path = 'models/{}/final.model'.format(model)
 vgg = VGGNet()
 serializers.load_hdf5('/tmp/VGG.model', vgg)
-tinynet = wordQueryNet()
+if args.usevgg == 1:
+    tinynet = wordQueryNet()
+else:
+    tinynet = wordQueryNetNoVGG()
 serializers.load_npz(model_path, tinynet)
 tinynet.to_gpu()
 words = ['布', '植物', 'ガラス', '革', '金属', '紙', 'プラスチック', '石', '水', '木', '樹脂', 'アクリル', 'アルミニウム', '牛皮', 'レンガ', '絹']
@@ -56,13 +76,19 @@ for word in words:
     for count in range(36):
         filename = 'images/valid/{}.jpg'.format(count)
         vgg_param = vggparamater(filename, 0, vgg)[0]
-        concatted = concatData(word, vgg_param)
+        if args.usevgg == 1:
+            concatted = concatData(word, vgg_param)
+        else:
+            concatted = w2v(word)
         print('moto:')
-        print(concatted[0][400:420])
-        print(concatted[0][0:10])
+        # print(concatted[0][400:420])
+        # print(concatted[0][0:10])
+        if args.usevgg == 0:
+            concatted = np.reshape(concatted, (1, 200))
+        print(concatted.shape)
         concatted_g = Variable(cuda.to_gpu(concatted))
         style_params = tinynet(concatted_g, train=False)
-        #print(style_params.data.shape,concatted_g.data.shape)
+        # print(style_params.data.shape,concatted_g.data.shape)
         print('params:')
         print(style_params.data[0][0:10])
         style_params_cpu = cuda.to_cpu(style_params.data)

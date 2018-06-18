@@ -61,6 +61,20 @@ def concatData(word, vgg_img_param):
     return np.transpose(param)
 
 
+def w2v(word):
+    # 時間がかかるのでデータがあれば読み込む
+    if os.path.isfile('wordparam/word2vecter' + word + '.npy'):
+        vec = np.load('wordparam/word2vecter' + word + '.npy')
+    else:
+        vec = word2vector(word)
+        # 時間がかかるのでデータを保存する
+        np.save('wordparam/word2vecter' + word + '.npy', vec)
+
+    vec = vec / np.linalg.norm(vec)
+
+    return vec
+
+
 # ####入力パラメータ#####
 parser = argparse.ArgumentParser(
     description='Real-time style transfer image generator')
@@ -151,7 +165,7 @@ dataset = []
 if args.usevgg == 1:
     styleg = np.array(concatData(words[0], vgg_img_param[0]))
 else:
-    styleg = np.array(words[0])
+    styleg = np.array(w2v(words[0]))
 style = np.reshape(np.array(target_img_param[0]), (1, 100))
 
 if args.usevgg == 1:
@@ -160,7 +174,7 @@ if args.usevgg == 1:
         style = np.vstack((style, np.reshape(target_img_param[i], (1, 100))))
 else:
     for i in range(1, len(filenames)):
-        styleg = np.vstack((styleg, words[i]))
+        styleg = np.vstack((styleg, w2v(words[i])))
         style = np.vstack((style, np.reshape(target_img_param[i], (1, 100))))
 
 print(styleg.shape, style.shape)
