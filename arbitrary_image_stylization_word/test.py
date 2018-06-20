@@ -30,6 +30,7 @@ from __future__ import print_function
 import ast
 import os
 import time
+import cv2
 
 import numpy as np
 import tensorflow as tf
@@ -69,6 +70,7 @@ flags.DEFINE_string('interpolation_weights', '[1.0]', 'List of weights'
                     'larger the weight is the strength of stylization is more.'
                     'Weight of 1.0 means the normal style transfer and weight'
                     'of 0.0 means identity transform.')
+flags.DEFINE_boolean('color_preserve', False, 'boolean coloer preserve mode')
 FLAGS = flags.FLAGS
 
 
@@ -152,8 +154,35 @@ def main(unused_argv=None):
                                       os.path.join(FLAGS.output_dir,
                                                    '%s.jpg' % (content_img_name)))
 
+            if FLAGS.color_preserve is True:
+                print('color preserve mode!')
+                # convert content iamge to ycc from bgr
+                height, width, channels = inp_img_croped_resized_np[0].shape[:3]
+                # print(inp_img_croped_resized_np)
+                wgap = 4 - (width % 4)  # fuking translater made some gaps because of decoder
+                hgap = 4 - (height % 4)
+                inp_img_croped_resized_np = inp_img_croped_resized_np * 255
+                content_img_np_ycc = cv2.cvtColor(inp_img_croped_resized_np[0], cv2.COLOR_RGB2YCR_CB)
+                # print(content_img_np_ycc)
+                zeros = np.zeros((height, width), content_img_np_ycc.dtype)
+                zeros = zeros + 128  # YCC's zero is center of 255
+                tmp = cv2.cvtColor(content_img_np_ycc, cv2.COLOR_YCR_CB2BGR)
+                cv2.imwrite("gray.jpg", tmp)
+                # print(zeros)
+                Ycontent, Crcontent, Cbcontent = cv2.split(content_img_np_ycc)
+                # print(Ycontent.shape, Crcontent.shape, Cbcontent.shape, zeros.shape)
+                # print(Crcontent)
+                # print(content_img_np_ycc)
+                # content_img_np_ycc_y = cv2.merge((Y, zeros, zeros))
+                # content_img_np_gry = cv2.cvtColor(content_img_np_ycc_y, cv2.COLOR_YCR_CB2RGB)
+                # print(content_img_np_gry)
+                # cv2.imwrite("gray.jpg", content_img_np_gry)
+                # print(np.shape(content_img_np))
+                # content_img_np = content_img_np_gry
+
             # Computes bottleneck features of the style prediction network for the
             # identity transform.
+
             identity_params = sess.run(
                 bottleneck_feat, feed_dict={style_img_ph: content_img_np})
 
@@ -191,7 +220,7 @@ def main(unused_argv=None):
                 picklename = 'params/{}_{}.pickle'.format(word, j)
                 f = open(picklename, 'r')
                 style_params = pickle.load(f)
-                print(style_params)
+                # print(style_params)
 
                 # print('diff of original para and made para:')
                 # print(style_params_ori - style_params)
@@ -210,11 +239,33 @@ def main(unused_argv=None):
                                 content_img_np
                         })
 
+                    if FLAGS.color_preserve is True:
+                        # print(stylized_image_res[0].shape)
+                        stylized_image_res_ycc = cv2.cvtColor(stylized_image_res[0], cv2.COLOR_RGB2YCR_CB)
+                        Ystylized, Crstylized, Cbstylized = cv2.split(stylized_image_res_ycc)
+                        if wgap == 4:  # if original image is just fit
+                            Ystylized_crop = Ystylized * 255
+                        else:
+                            Ystylized_crop = Ystylized[:, :-1 * wgap] * 255
+                        if hgap == 4:
+                            Ystylized_crop = Ystylized_crop
+                        else:
+                            Ystylized_crop = Ystylized_crop[:-1 * hgap, :]
+                        print(Ystylized_crop.shape, Cbcontent.shape)
+                        # print(wgap)
+                        swapped_ycc = cv2.merge((Ystylized_crop, Crcontent, Cbcontent))
+                        # print(swapped_ycc)
+                        stylized_image_res = cv2.cvtColor(swapped_ycc, cv2.COLOR_YCR_CB2BGR)
+                        # print(stylized_image_res)
+                        cv2.imwrite(os.path.join(FLAGS.output_dir, '%s_stylized_%s_%d.jpg' % (content_img_name, word, interp_i)), stylized_image_res)
+
                     # Saves stylized image.
-                    image_utils.save_np_image(
-                        stylized_image_res,
-                        os.path.join(FLAGS.output_dir, '%s_stylized_%s_%d.jpg' %
-                                     (content_img_name, word, interp_i)))
+                    else:
+                        image_utils.save_np_image(
+                            stylized_image_res,
+                            os.path.join(FLAGS.output_dir, '%s_stylized_%s_%d.jpg' %
+                                         (content_img_name, word, interp_i)))
+
     elapsed_time = time.time() - start
     print("timer stop")
     print(elapsed_time)
