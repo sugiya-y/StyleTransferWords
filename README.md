@@ -28,9 +28,24 @@ sh ****.sh
 ```
 cp ./VGG.model /tmp/
 ```
-学習をします
+学習をします。すぐ終わります。
 ```
 python train_tinynet.py -d *** -u 1
 ```
 -d で出力のディレクトリ名を指定します。指定したディレクトリ名でmodels/の下に出力されます。
 -u でVGGを使用するかどうかを指定します。1で使用し、0で使用しません。
+
+### test
+まず、chainerでパラメータを生成します。
+```
+python test_pre.py -m *** -u 1
+```
+-m で学習したモデルの入ったディレクトリ名(train時に指定した -d オプションと同じ名前)を指定します。
+-u でVGGを使用するかどうかを指定します。1で使用し、0で使用しません。
+
+次に、生成したパラメータから画像を生成します。
+```
+python test.py --output_dir out_ours/***　--color_preserve
+```
+--output_dir で出力するディレクトリを指定します。
+--color_preserve で元画像の色を保持します。デフォルトはFalseでこのオプションをつけるとTrueになります。
