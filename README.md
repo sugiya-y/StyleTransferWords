@@ -45,6 +45,7 @@ python test_pre.py -m *** -u 1
 
 次に、生成したパラメータから画像を生成します。
 ```
-python test.py --output_dir out_ours/***
+python test.py --output_dir out_ours/***　--color_preserve
 ```
 --output_dir で出力するディレクトリを指定します。
+--color_preserve で元画像の色を保持します。デフォルトはFalseでこのオプションをつけるとTrueになります。
