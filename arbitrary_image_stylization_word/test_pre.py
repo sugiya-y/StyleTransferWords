@@ -73,7 +73,7 @@ serializers.load_npz(model_path, tinynet)
 tinynet.to_gpu()
 words = ['布', '植物', 'ガラス', '革', '金属', '紙', 'プラスチック', '石', '水', '木', '樹脂', 'アクリル', 'アルミニウム', '牛皮', 'レンガ', '絹']
 for word in words:
-    for count in range(36):
+    for count in range(24):
         filename = 'images/valid/{}.jpg'.format(count)
         vgg_param = vggparamater(filename, 0, vgg)[0]
         if args.usevgg == 1:
