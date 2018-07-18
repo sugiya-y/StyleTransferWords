@@ -11,6 +11,11 @@
 /arbitrary_image_stylization_word/log/
 /arbitrary_image_stylization_word/params/*
 /arbitrary_image_stylization_word/out_ours/
+/word2vec_en/enwiki/*
+/word2vec_en/enwiki.model
+/word2vec_en/enwiki.model*
+/word2vec_en/enwiki.txt
+/word2vec_en/enwiki_reduced.txt
 *.pyc
 *.model
 *.pickle
