@@ -17,5 +17,6 @@
 /word2vec_en/enwiki.txt
 /word2vec_en/enwiki_reduced.txt
 *.pyc
+*.log
 *.model
 *.pickle
