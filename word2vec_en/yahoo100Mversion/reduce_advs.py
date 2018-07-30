@@ -1,4 +1,3 @@
-
 import os
 import _pickle as cPickle
 import re
@@ -18,12 +17,13 @@ print('reducing advs...')
 selected = []
 for adv in advs:
     adv = adv.rstrip('\n')
-    try:
-        print(adv, 'is exists!')
-        vec = model.wv[adv]
-        selected.append(adv)
-    except KeyError:
-        print(adv, 'is NONE!')
+    if len(adv) >= 3:
+        try:
+            print(adv, 'is exists!')
+            vec = model.wv[adv]
+            selected.append(adv)
+        except KeyError:
+            print(adv, 'is NONE!')
 
 with open('yahoo100m_adv_exists.pickle', mode='wb') as f:
     cPickle.dump(selected, f, protocol=-1)
