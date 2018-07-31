@@ -1,39 +1,35 @@
-
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# coding:utf-8
 
 import os
 import numpy as np
 # import argparse
 # from PIL import ImageFile
 from chainer import cuda, serializers, Variable
-from tinynet import wordQueryNet
-from tinynet_novgg import wordQueryNetNoVGG
-from wordparam import word2vector
+from gensim.models import word2vec
 from vggparam import vggparamater
 from vggnet import VGGNet
 import pickle
 import argparse
+from tinygan import Generator
 # import chainer
 # import chainer.functions as F
 
 
+wmodel = word2vec.Word2Vec.load("../word2vec_en/enwiki.model")
+
+
 def concatData(word, vgg_img_param):
-    # 時間がかかるのでデータがあれば読み込む
-    if os.path.isfile('wordparam/word2vecter' + word + '.npy'):
-        vec = np.load('wordparam/word2vecter' + word + '.npy')
-    else:
-        vec = word2vector(word)
-        # 時間がかかるのでデータを保存する
-        np.save('wordparam/word2vecter' + word + '.npy', vec)
+    vec = wmodel.wv[word]
 
     param = np.zeros((500, 1))
-    vec= vec / np.linalg.norm(vec)
-    vec = vec * 5
+    vec = vec / np.linalg.norm(vec)
+    # vec = vec * 2
     # print('word: ' + str(np.mean(vec)))
     # print('vgg: ' + str(np.mean(vgg_img_param)))
-    vgg_img_param=np.array(vgg_img_param)
-    vgg_img_param= vgg_img_param/ np.linalg.norm(vgg_img_param)
+    vgg_img_param = np.array(vgg_img_param)
+    vgg_img_param = vgg_img_param / np.linalg.norm(vgg_img_param)
     concated = np.concatenate((vec, vgg_img_param))
     param = np.reshape(concated, (500, 1))
 
@@ -41,14 +37,7 @@ def concatData(word, vgg_img_param):
 
 
 def w2v(word):
-    # 時間がかかるのでデータがあれば読み込む
-    if os.path.isfile('wordparam/word2vecter' + word + '.npy'):
-        vec = np.load('wordparam/word2vecter' + word + '.npy')
-    else:
-        vec = word2vector(word)
-        # 時間がかかるのでデータを保存する
-        np.save('wordparam/word2vecter' + word + '.npy', vec)
-
+    vec = wmodel.wv[word]
     vec = vec / np.linalg.norm(vec)
 
     return vec
@@ -67,14 +56,15 @@ model_path = 'models/{}/final.model'.format(model)
 vgg = VGGNet()
 serializers.load_hdf5('/tmp/VGG.model', vgg)
 if args.usevgg == 1:
-    tinynet = wordQueryNet()
+    tinynet = Generator()
 else:
-    tinynet = wordQueryNetNoVGG()
+    tinynet = Generator()
 serializers.load_npz(model_path, tinynet)
 tinynet.to_gpu()
-words = ['布', '植物', 'ガラス', '革', '金属', '紙', 'プラスチック', '石', '水', '木', '樹脂', 'アクリル', 'アルミニウム', '牛皮', 'レンガ', '絹']
+words = ['outdoor', 'black', 'urban', 'white',
+         'indoor', 'new', 'serene', 'red', 'light', 'tree']
 for word in words:
-    for count in range(24):
+    for count in range(28):
         filename = 'images/valid/{}.jpg'.format(count)
         vgg_param = vggparamater(filename, 0, vgg)[0]
         if args.usevgg == 1:
@@ -96,6 +86,6 @@ for word in words:
         style_params_cpu = np.reshape(style_params_cpu, (1, 1, 1, 100))
 
         print('params/{}_{}.pickle'.format(word, count))
-        f = open('params/{}_{}.pickle'.format(word, count), 'w')
+        f = open('params/{}_{}.pickle'.format(word, count), 'wb')
         pickle.dump(style_params_cpu, f)
         f.close

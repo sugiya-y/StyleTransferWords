@@ -5,7 +5,10 @@
 import random
 import numpy as np
 import os
-import _pickle as cPickle
+try:
+    import _pickle as cPickle
+except ImportError:
+    import cPickle
 import re
 import time
 

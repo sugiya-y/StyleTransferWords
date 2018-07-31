@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# coding:utf-8
 
 import numpy as np
 import cv2 as cv
-import cPickle as pickle
+try:
+    import cPickle as pickle
+except ModuleNotFoundError:
+    import _pickle as pickle
 from chainer import cuda
 from chainer import Variable
 
@@ -28,8 +32,8 @@ def vggparamater(image, gpu, vgg):  # image:str(path to image file) gpu:number(g
     else:
         pred = pred.data
 
-    with open('pca.pickle', 'rb') as f:
-        pca = pickle.load(f)
+    with open('pca.pickle', mode='rb') as f:
+        pca = pickle.load(f, encoding='latin1')
 
     result = pca.transform(pred)
 

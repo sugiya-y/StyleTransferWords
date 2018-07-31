@@ -41,11 +41,10 @@ print('inception v3 time: ' + str(calctime) + '[sec]')
 import argparse
 from PIL import ImageFile
 from chainer import cuda, Variable, optimizers, serializers
-from tinynet import wordQueryNet
-from tinynet_novgg import wordQueryNetNoVGG
 from gensim.models import word2vec
 from vggparam import vggparamater
 from vggnet import VGGNet
+from tinygan import Generator, Discriminator
 import chainer
 import chainer.functions as F
 ImageFile.LOAD_TRUNCATED_IMAGES = True
@@ -94,10 +93,9 @@ xp = np if args.gpu < 0 else cuda.cupy
 # ########パラメータセット###########
 
 batch = 0
-batchsize = 50
+batchsize = 1000
 device = args.gpu
 n_epoch = 50
-# a = wordQueryNet()
 
 # 保存先をチェックする
 if os.path.exists('models/' + args.dir):
@@ -139,20 +137,28 @@ if args.usevgg == 1:
 print('training start')
 dataset = []
 
-if args.usevgg == 1:
-    styleg = np.array(concatData(words[0], vgg_img_param[0]))
+if os.path.isfile('style.npy'):
+    print('the file is exists! load...')
+    styleg = np.load('styleg.npy')
+    style = np.load('style.npy')
 else:
-    styleg = np.array(w2v(words[0]))
-style = np.reshape(np.array(target_img_param[0]), (1, 100))
+    print('features file not exists! making...')
+    if args.usevgg == 1:
+        styleg = np.array(concatData(words[0], vgg_img_param[0]))
+    else:
+        styleg = np.array(w2v(words[0]))
+    style = np.reshape(np.array(target_img_param[0]), (1, 100))
 
-if args.usevgg == 1:
-    for i in range(1, len(filenames)):
-        styleg = np.vstack((styleg, concatData(words[i], vgg_img_param[i])))
-        style = np.vstack((style, np.reshape(target_img_param[i], (1, 100))))
-else:
-    for i in range(1, len(filenames)):
-        styleg = np.vstack((styleg, w2v(words[i])))
-        style = np.vstack((style, np.reshape(target_img_param[i], (1, 100))))
+    if args.usevgg == 1:
+        for i in range(1, len(filenames)):
+            styleg = np.vstack((styleg, concatData(words[i], vgg_img_param[i])))
+            style = np.vstack((style, np.reshape(target_img_param[i], (1, 100))))
+    else:
+        for i in range(1, len(filenames)):
+            styleg = np.vstack((styleg, w2v(words[i])))
+            style = np.vstack((style, np.reshape(target_img_param[i], (1, 100))))
+    np.save('styleg',styleg)
+    np.save('style',style)
 
 print(styleg.shape, style.shape)
 
@@ -160,17 +166,22 @@ print(styleg.shape, style.shape)
 # dataset = chainer.cuda.to_gpu(dataset)
 # dataset = [words, target_img_param, vgg_img_param]
 if args.usevgg == 1:
-    tinynet = wordQueryNet()
+    gen = Generator()
+    dis = Discriminator()
 else:
-    tinynet = wordQueryNetNoVGG()
+    gen = Generator()
+    dis = Discriminator()
 
 # print('a')
 # Optimizer = optimizers.MomentumSGD(lr=0.001, momentum=0.9)
-Optimizer = optimizers.Adam(alpha=0.001, beta1=0.9, beta2=0.999, eps=1e-08)
-Optimizer.setup(tinynet)
+Optimizer_gen = optimizers.Adam(alpha=0.001, beta1=0.9, beta2=0.999, eps=1e-08)
+Optimizer_gen.setup(gen)
+Optimizer_dis = optimizers.Adam(alpha=0.001, beta1=0.9, beta2=0.999, eps=1e-08)
+Optimizer_dis.setup(dis)
 if device >= 0:
     cuda.get_device(device).use()
-    tinynet.to_gpu()
+    gen.to_gpu()
+    dis.to_gpu()
 
 debug = False
 
@@ -181,15 +192,19 @@ for epoch in range(n_epoch):
     ct = 0
     # print('epoch:' + str(epoch) + ' learning rate: ' + str(Optimizer.lr))
     print('epoch:' + str(epoch))
-    Lsum = Variable(xp.zeros((), dtype=np.float32))
+    Lsum_gen = Variable(xp.zeros((), dtype=np.float32))
+    Lsum_dis = Variable(xp.zeros((), dtype=np.float32))
     while(batch + batchsize) <= style.shape[0]:
         ct = ct + 1
-        tinynet.zerograds()
+        gen.zerograds()
+        dis.zerograds()
         styleparam_g = Variable(chainer.cuda.to_gpu(
             styleg[batch:batch + batchsize]))
         styleparam = Variable(chainer.cuda.to_gpu(
             style[batch:batch + batchsize]))
-        style_vector = tinynet(styleparam_g)
+        style_vector = gen(styleparam_g)
+        dis_out1 = dis(style_vector) # にせもの
+        dis_out2 = dis(styleparam) # ほんもの
         if debug:
             print('params:')
             print(style_vector.data[2][0:10])
@@ -197,21 +212,28 @@ for epoch in range(n_epoch):
         # print(style_vector.data.shape,styleparam.data.shape)
 
         #    da = chainer.cuda.to_gpu(data[1])
-        loss = F.mean_squared_error(style_vector, styleparam)
+        loss_gen = F.softmax_cross_entropy(dis_out1, Variable(xp.zeros(batchsize, dtype=np.int32))) # 生成したパラメータがどうなのかadversarial loss, 0本物に近づけたい
+        loss_dis = F.softmax_cross_entropy(dis_out1, Variable(xp.ones(batchsize, dtype=np.int32))) # 1(偽物)に近づけたい
+        loss_dis += F.softmax_cross_entropy(dis_out2, Variable(xp.zeros(batchsize, dtype=np.int32))) # 本物をdiscriminatorに入力. 0(本物)に近づけたい
         # data[1] = chainer.cuda.to_cpu(data[1])
-        Lsum += loss
-        if batch < 9500:
-            loss.backward()
-            Optimizer.update()
-        else:
-            print("val loss: %s" % (loss.data))
+        Lsum_gen += loss_gen
+        Lsum_dis += loss_dis
+        if batch < style.shape[0] * 0.9:
+            loss_gen.backward()
+            Optimizer_gen.update()
+            loss_dis.backward()
+            Optimizer_dis.update()
+        # else:
+            # print("val loss: gen:%s  dis:%s" % (loss_gen.data, loss_dis.data))
         batch += batchsize
         # if(batch % 1000 == 0):
         #    print('batch loss: ' + str(loss.data))
-    loss_mean = Lsum.data / ct
-    print('training loss in this epoch:' + str('%1.10f' % loss_mean))
+    loss_gen_mean = Lsum_gen.data / ct
+    loss_dis_mean = Lsum_dis.data / ct
+    print('training loss in this epoch [Generator]:' + str('%1.10f' % loss_gen_mean))
+    print('training loss in this epoch [Discriminator]:' + str('%1.10f' % loss_dis_mean))
     # print('epoch weight' + str(tinynet.W))
     calctime = time.time() - start
     print('learning time in thins epoch: ' + str(calctime) + '[sec]')
     # serializers.save_npz('models/{}/epoch_{}.model'.format(args.dir, epoch), tinynet)
-serializers.save_npz('models/{}/final.model'.format(args.dir), tinynet)
+serializers.save_npz('models/{}/final.model'.format(args.dir), gen)
