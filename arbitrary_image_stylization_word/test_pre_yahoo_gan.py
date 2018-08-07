@@ -52,7 +52,7 @@ parser.add_argument('--usevgg', '-u', default=1, type=int,
 args = parser.parse_args()
 
 model = args.model
-model_path = 'models/{}/final.model'.format(model)
+model_path = 'models/yahoo100m_gan/epoch_{}.model'.format(model)
 vgg = VGGNet()
 serializers.load_hdf5('/tmp/VGG.model', vgg)
 if args.usevgg == 1:
@@ -62,7 +62,7 @@ else:
 serializers.load_npz(model_path, tinynet)
 tinynet.to_gpu()
 words = ['outdoor', 'black', 'urban', 'white',
-         'indoor', 'new', 'serene', 'red', 'light', 'tree']
+         'indoor', 'new', 'serene', 'red', 'light', 'tree', 'country', 'old', 'dark']
 for word in words:
     for count in range(28):
         filename = 'images/valid/{}.jpg'.format(count)

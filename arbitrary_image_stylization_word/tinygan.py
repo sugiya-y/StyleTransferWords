@@ -40,7 +40,7 @@ class Discriminator(chainer.Chain):
             l2=L.Linear(100, 100),
             l3=L.Linear(100, 2),
         )
-    
+
     def __call__(self, h, train=True):
         h = self.l1(h)
         h = F.relu(h)

@@ -95,7 +95,7 @@ xp = np if args.gpu < 0 else cuda.cupy
 batch = 0
 batchsize = 1000
 device = args.gpu
-n_epoch = 50
+n_epoch = 81
 
 # 保存先をチェックする
 if os.path.exists('models/' + args.dir):
@@ -235,5 +235,6 @@ for epoch in range(n_epoch):
     # print('epoch weight' + str(tinynet.W))
     calctime = time.time() - start
     print('learning time in thins epoch: ' + str(calctime) + '[sec]')
-    # serializers.save_npz('models/{}/epoch_{}.model'.format(args.dir, epoch), tinynet)
+    if epoch % 5 == 0:
+        serializers.save_npz('models/{}/epoch_{}.model'.format(args.dir, epoch), gen)
 serializers.save_npz('models/{}/final.model'.format(args.dir), gen)

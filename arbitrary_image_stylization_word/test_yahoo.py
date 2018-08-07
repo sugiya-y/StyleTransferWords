@@ -80,7 +80,7 @@ def main(unused_argv=None):
 
 
     words = ['outdoor', 'black', 'urban', 'white',
-            'indoor', 'new', 'serene', 'red', 'light', 'tree']
+             'indoor', 'new', 'serene', 'red', 'light', 'tree', 'country', 'old', 'dark']
     config = tf.ConfigProto(gpu_options=tf.GPUOptions(allow_growth=True))
     sess = tf.Session(config=config)
 
