@@ -67,7 +67,12 @@ python test_yahoo.py --output_dir out_ours/***　--color_preserve
 ### めんどい向け
 上のtestの作業は一番うまく行ったと思っているGANmodelのepoch35のmodelで実行するなら
 ```
-./testgan_35.sh
+./testgan_35.sh ***
 ```
-で実行できます.
+で実行できます. *** には出力先ディレクトリ名を入れてください。
 保存先は out_ours/*** になります。
+
+### その他注意
+- ファイル名には画像名、変換に使用した形容詞が含まれています。
+- test_pre.py, test_pre_yahoo_gan.pyではクソコードかましてるのでvalidに入れる画像ファイルには0から始まる連番でファイル名をつけてください。
+- さらにfor文のiterationも数字を入れなきゃいけないのでvalidの中にあるファイルの数を67行目のrangeに入れてください。ファイル名の最後+1になります。
