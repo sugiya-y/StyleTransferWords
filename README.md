@@ -57,8 +57,9 @@ GAN使ってるバージョンでは。
 
 ```
 python test_pre_yahoo_gan.py -m *** -u 0
+python test_yahoo.py --output_dir out_ours/***　--color_preserve
 ```
-をtest_pre.pyの代わりにやってください。
+をtest_pre.py, test.pyの代わりにやってください。
 
 ### めんどい向け
 上のtestの作業は一番うまく行ったと思っているGANmodelのepoch35のmodelで実行するなら
