@@ -53,6 +53,13 @@ python test.py --output_dir out_ours/***　--color_preserve
 全体として -u オプションを1にするのは推奨していません。遅い。あんまり結果も変わらない。
 GANバージョンでは学習もしてないので0で実行してください。
 
+GAN使ってるバージョンでは。
+
+```
+python test_pre_yahoo_gan.py -m *** -u 0
+```
+をtest_pre.pyの代わりにやってください。
+
 ### めんどい向け
 上のtestの作業は一番うまく行ったと思っているGANmodelのepoch35のmodelで実行するなら
 ```
