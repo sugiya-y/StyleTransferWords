@@ -49,3 +49,10 @@ python test.py --output_dir out_ours/***　--color_preserve
 ```
 --output_dir で出力するディレクトリを指定します。
 --color_preserve で元画像の色を保持します。デフォルトはFalseでこのオプションをつけるとTrueになります。
+
+### めんどい向け
+上のtestの作業は一番うまく行ったと思っているGANmodelのepoch35のmodelで実行するなら
+```
+./testgan_35.sh
+```
+で実行できます.
