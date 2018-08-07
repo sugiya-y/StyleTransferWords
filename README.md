@@ -36,6 +36,9 @@ python train_tinynet.py -d *** -u 1
 -u でVGGを使用するかどうかを指定します。1で使用し、0で使用しません。
 
 ### test
+arbitrary_style_transfer/images/valid
+の中にある画像ジャイル全てに対して実行を行います。
+
 まず、chainerでパラメータを生成します。
 ```
 python test_pre.py -m *** -u 1
@@ -67,3 +70,4 @@ python test_yahoo.py --output_dir out_ours/***　--color_preserve
 ./testgan_35.sh
 ```
 で実行できます.
+保存先は out_ours/*** になります。
