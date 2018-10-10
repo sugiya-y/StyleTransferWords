@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="400px" height="400px">
+    <text fill="rgb(164, 28, 28)" font-size="56.8" x="64.6" y="142.8" textLength="304.9">
+        check this
+    </text>
+    <ellipse fill="rgb(164, 28, 28)" cx="27" cy="166" rx="0" ry="0"/>
+    <ellipse fill="rgb(164, 28, 28)" cx="209.5" cy="234.5" rx="177.5" ry="73.5"/>
+    <rect fill="rgb(241, 241, 241)" x="101" y="6" width="119" height="61"/>
+</svg>
