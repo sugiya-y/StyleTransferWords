@@ -20,7 +20,6 @@ import cv2 as cv
 
 vgg = VGGNet()
 serializers.load_hdf5('/tmp/VGG.model', vgg)
-serializers.load_npz(model_path, tinynet)
 mean = np.array([103.939, 116.779, 123.68])
 
 img = cv.imread(image).astype(np.float32)
@@ -28,6 +27,7 @@ img -= mean
 img = cv.resize(img, (224, 224)).transpose((2, 0, 1))
 img = img[np.newaxis, :, :, :]
 
+gpu = 0
 if gpu >= 0:
     cuda.get_device(gpu).use()
     vgg.to_gpu()
