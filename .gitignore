@@ -21,4 +21,4 @@
 *.model
 *.pickle
 *.npy
-.deploy.sh
+deploy.sh
