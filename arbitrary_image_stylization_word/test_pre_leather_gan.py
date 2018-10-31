@@ -2,17 +2,20 @@
 # -*- coding: utf-8 -*-
 # coding:utf-8
 
+import argparse
 import os
+import pickle
+
 import numpy as np
+
 # import argparse
 # from PIL import ImageFile
-from chainer import cuda, serializers, Variable
+from chainer import Variable, cuda, serializers
 from gensim.models import word2vec
-from vggparam import vggparamater
-from vggnet import VGGNet
-import pickle
-import argparse
 from tinygan import Generator
+from vggnet import VGGNet
+from vggparam import vggparamater
+
 # import chainer
 # import chainer.functions as F
 
@@ -79,7 +82,7 @@ words = ['recent',
         'old',
         ]
 for word in words:
-    for count in range(28):
+    for count in range(30):
         filename = 'images/valid/{}.jpg'.format(count)
         vgg_param = vggparamater(filename, 0, vgg)[0]
         if args.usevgg == 1:
