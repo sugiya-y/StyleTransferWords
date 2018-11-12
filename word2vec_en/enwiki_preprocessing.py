@@ -1,6 +1,10 @@
-from gensim.parsing.preprocessing import strip_punctuation, remove_stopwords, strip_multiple_whitespaces
-import sys
 import io
+import sys
+
+from gensim.parsing.preprocessing import (remove_stopwords,
+                                          strip_multiple_whitespaces,
+                                          strip_punctuation)
+
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 # read english wikipedia data
@@ -22,4 +26,3 @@ for line in lines:
 print('finish reducing. start save')
 f = open('enwiki_reduced.txt', 'w', encoding='utf-8')
 f.writelines(reduced_list)
-f.close()
