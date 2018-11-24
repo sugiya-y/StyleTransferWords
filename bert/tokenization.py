@@ -14,13 +14,16 @@
 # limitations under the License.
 """Tokenization classes."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function
 
+import codecs
 import collections
+import sys
 import unicodedata
+
 import six
+
+sys.stdout = codecs.getwriter("utf-8")(sys.stdout)
 
 
 def convert_to_unicode(text):
@@ -70,7 +73,7 @@ def load_vocab(vocab_file):
     """Loads a vocabulary file into a dictionary."""
     vocab = collections.OrderedDict()
     index = 0
-    with open(vocab_file, "r") as reader:
+    with open(vocab_file, "r", errors='ignore') as reader:
         while True:
             token = convert_to_unicode(reader.readline())
             if not token:
@@ -181,7 +184,7 @@ class BasicTokenizer(object):
             i += 1
 
         return ["".join(x) for x in output]
-    
+
     def _tokenize_chinese_chars(self, text):
         """Adds whitespace around any CJK character."""
         output = []
@@ -214,9 +217,9 @@ class BasicTokenizer(object):
             (cp >= 0xF900 and cp <= 0xFAFF) or  #
             (cp >= 0x2F800 and cp <= 0x2FA1F)):  #
             return True
-    
+
         return False
-    
+
     def _clean_text(self, text):
         """Performs invalid character removal and whitespace cleanup on text."""
         output = []

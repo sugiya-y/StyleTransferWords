@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Extract pre-computed feature vectors from a PyTorch BERT model."""
-
 from __future__ import absolute_import, division, print_function
 
 import argparse
@@ -22,6 +21,7 @@ import collections
 import json
 import logging
 import re
+import sys
 
 import torch
 from torch.utils.data import (DataLoader, RandomSampler, SequentialSampler,
@@ -31,11 +31,13 @@ from torch.utils.data.distributed import DistributedSampler
 import tokenization
 from modeling import BertConfig, BertModel
 
-logging.basicConfig(
-    format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
-    datefmt='%m/%d/%Y %H:%M:%S',
-    level=logging.INFO)
-logger = logging.getLogger(__name__)
+sys.stdout = codecs.getwriter("utf-8")(sys.stdout)
+
+# logging.basicConfig(
+#     format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
+#     datefmt='%m/%d/%Y %H:%M:%S',
+#     level=logging.INFO)
+# logger = logging.getLogger(__name__)
 
 
 class InputExample(object):
@@ -129,16 +131,16 @@ def convert_examples_to_features(examples, seq_length, tokenizer):
         assert len(input_mask) == seq_length
         assert len(input_type_ids) == seq_length
 
-        if ex_index < 5:
-            logger.info("*** Example ***")
-            logger.info("unique_id: %s" % (example.unique_id))
-            logger.info("tokens: %s" % " ".join([str(x) for x in tokens]))
-            logger.info(
-                "input_ids: %s" % " ".join([str(x) for x in input_ids]))
-            logger.info(
-                "input_mask: %s" % " ".join([str(x) for x in input_mask]))
-            logger.info("input_type_ids: %s" % " ".join(
-                [str(x) for x in input_type_ids]))
+        # if ex_index < 5:
+        # logger.info("*** Example ***")
+        # logger.info("unique_id: %s" % (example.unique_id))
+        # logger.info("tokens: %s" % " ".join([str(x) for x in tokens]))
+        # logger.info(
+        #     "input_ids: %s" % " ".join([str(x) for x in input_ids]))
+        # logger.info(
+        #     "input_mask: %s" % " ".join([str(x) for x in input_mask]))
+        # logger.info("input_type_ids: %s" % " ".join(
+        #     [str(x) for x in input_type_ids]))
 
         features.append(
             InputFeatures(
@@ -203,7 +205,7 @@ def seq2vec(sentence):
     do_lower_case = True
     batch_size = 8
     local_rank = -1
-    no_cuda = True
+    no_cuda = False
 
     with open(input_file, 'w') as writer:
         writer.write(sentence)
@@ -216,9 +218,9 @@ def seq2vec(sentence):
         device = torch.device("cuda", local_rank)
         n_gpu = 1
         # Initializes the distributed backend which will take care of sychronizing nodes/GPUs
-        torch.distributed.init_process_group(backend='nccl')
-    logger.info("device", device, "n_gpu", n_gpu, "distributed training",
-                bool(local_rank != -1))
+        # torch.distributed.init_process_group(backend='nccl')
+    # logger.info("device", device, "n_gpu", n_gpu, "distributed training",
+    #             bool(local_rank != -1))
 
     layer_indexes = [int(x) for x in layers.split(",")]
 
@@ -228,7 +230,7 @@ def seq2vec(sentence):
         vocab_file=vocab_file, do_lower_case=do_lower_case)
 
     examples = read_examples(input_file)
-    print(input_file)
+    # print(input_file)
 
     features = convert_examples_to_features(
         examples=examples, seq_length=max_seq_length, tokenizer=tokenizer)
@@ -305,4 +307,5 @@ def seq2vec(sentence):
 
 if __name__ == "__main__":
     param = seq2vec("Who was Jim Henson and Jerremy Crarcson or Richard Hammond ?")
-    print(len(param))
+    import pdb
+    pdb.Pdb(stdout=sys.__stdout__).set_trace()
