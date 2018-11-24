@@ -14,7 +14,7 @@ sys.stdout = codecs.getwriter("utf-8")(sys.stdout)
 
 
 def main():
-    with open('/tmp/enwiki.txt', encoding='utf-8') as f:
+    with open('/tmp/enwiki_reduced.txt', encoding='utf-8') as f:
         lines = f.readlines()
     lines = [line.rstrip() for line in lines]
     parsed = []

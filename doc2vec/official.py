@@ -22,7 +22,8 @@ class TaggedWikiDocument(object):
 documents = TaggedWikiDocument(wiki)
 
 pre = Doc2Vec(min_count=0)
-pre.scan_vocab(documents)
+pre.build_vocab(documents)
+print('scan_vocab')
 
 for num in range(0, 20):
     print('min_count: {}, size of vocab: '.format(num), pre.scale_vocab(min_count=num, dry_run=True)['memory']['vocab']/700)
