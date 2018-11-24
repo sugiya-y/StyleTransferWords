@@ -195,9 +195,9 @@ def read_examples(input_file):
 def seq2vec(sentence):
     input_file = '/tmp/input.txt'
     output_file = '/tmp/output.json'
-    vocab_file = '/Users/sugiyamayuu/git/pytorch-pretrained-BERT/uncased_L-12_H-768_A-12/vocab.txt'
-    bert_config_file = '/Users/sugiyamayuu/git/pytorch-pretrained-BERT/uncased_L-12_H-768_A-12/bert_config.json'
-    init_checkpoint = '/Users/sugiyamayuu/git/pytorch-pretrained-BERT/uncased_L-12_H-768_A-12/pytorch_model.bin'
+    vocab_file = '/home/yanai-lab/sugiya-y/space/research/bert/pretrain/uncased_L-12_H-768_A-12/vocab.txt'
+    bert_config_file = '/home/yanai-lab/sugiya-y/space/research/bert/pretrain/uncased_L-12_H-768_A-12/bert_config.json'
+    init_checkpoint = '/home/yanai-lab/sugiya-y/space/research/bert/pretrain/uncased_L-12_H-768_A-12/pytorch_model.bin'
     layers = '-1,-2,-3,-4'
     max_seq_length = 128
     do_lower_case = True
