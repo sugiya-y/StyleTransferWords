@@ -111,8 +111,8 @@ def styleParam(style_img_list):
                 bottleneck_feat, feed_dict={style_img_ph: style_image_np})
             style_param_matrix.append(style_params)
             count += 1
-            if count % 100 == 0:
-                print(count, '/', len(style_img_list))
+            # if count % 100 == 0:
+            #     print(count, '/', len(style_img_list))
 
     # style_param_matrix is (num_of_images,100) vector
     return(style_param_matrix)

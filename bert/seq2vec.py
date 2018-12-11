@@ -19,7 +19,6 @@ import argparse
 import codecs
 import collections
 import json
-import logging
 import re
 import sys
 
@@ -28,8 +27,10 @@ from torch.utils.data import (DataLoader, RandomSampler, SequentialSampler,
                               TensorDataset)
 from torch.utils.data.distributed import DistributedSampler
 
+sys.path.append('/home/yanai-lab/sugiya-y/space/research/privateWork/bert')
 import tokenization
 from modeling import BertConfig, BertModel
+
 
 sys.stdout = codecs.getwriter("utf-8")(sys.stdout)
 
