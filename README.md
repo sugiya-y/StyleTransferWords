@@ -1,5 +1,4 @@
 # StyleTransferWords
-```
 
 ## Requirement
 - python2.7 (Anaconda install)
