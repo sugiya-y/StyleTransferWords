@@ -1,13 +1,4 @@
-# privateWork
-for private work
-
-このディレクトリの中に色々と作っていきます。
-公開しても良いようになったらそのディレクトリだけ別でレポジトリ作って公開しようと思います。
-
-.gitがあるのは
-
-```
-/host/space/sugiya-y/research/privateWork
+# StyleTransferWords
 ```
 
 ## Requirement
